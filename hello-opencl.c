@@ -19,6 +19,7 @@
 //#define DEVICE_TYPE	CL_DEVICE_TYPE_CPU
 #define DEVICE_TYPE	CL_DEVICE_TYPE_ACCELERATOR
 
+#define MAX_SOURCE_SIZE (0x100000)
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -105,24 +106,24 @@ int main()
    //---------------------------------------------------------
    //The kernel
    //---------------------------------------------------------   
-   const char kernel_code[] = 
-      "__kernel void matvecmult_kern(\n"
-      "   uint n,__global float* a,__global float* b,__global float* c )\n"
-      "{\n"
-      "   int i = get_global_id(0);\n"
-      "   int j;\n"
-      "   float tmp = 0.0f;\n"
-      "   for(j=0;j<n;j++) tmp += a[i*n+j] * b[j];\n"
-      "   c[i] = a[i*n+i];\n"
-      "}\n";
+   FILE *fp;
+   const char fileName[] = "./kernel.cl";
+   char* src;
+   size_t src_sz;
 
+   /* Load kernel source file */
+   fp = fopen(fileName, "r");
+   if (!fp) {
+      fprintf(stderr, "Failed to load kernel.\n");
+		exit(1);
+   }
+   src = (char *)malloc(MAX_SOURCE_SIZE);
+   src_sz = fread(src, 1, MAX_SOURCE_SIZE, fp);
+   fclose(fp);
 
    //---------------------------------------------------------
    //Compiling the kernel
    //---------------------------------------------------------   
-   const char* src[1] = { kernel_code };
-   size_t src_sz = sizeof(kernel_code);
-
    cl_program prg = clCreateProgramWithSource(ctx,1,(const char**)&src,
 		&src_sz,&err);
 
