@@ -22,6 +22,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <CL/cl.h>
 
 int main()
@@ -177,5 +178,6 @@ int main()
    free(b);
    free(c);
 
+   return 0;
 }
 
